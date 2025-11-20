@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>妙麗歲數計算機</title>
+
+<!-- 七段顯示器字型 -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    margin: 0;
+    background-image: url("Dog-3.png.webp");
+    background-size: cover;
+    background-repeat: repeat;
+    font-family: sans-serif;
+  }
+
+  .container {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    background: white;
+    padding: 20px;
+    border-radius: 0;
+  }
+
+  .title {
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: black;
+  }
+
+  .title img {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* CASIO F-91W 外框 */
+  .lcd-box {
+    margin-top: 10px;
+    padding: 15px;
+    border: 3px solid #555;
+    border-radius: 12px;
+    background: #e9f1f8;
+    box-shadow:
+      inset 0 0 3px #000,
+      inset 0 0 12px #7ea7c2;
+  }
+
+  .label {
+    font-size: 16px;
+    color: black;
+  }
+
+  /* 七段顯示器輸入框 */
+  input[type="date"] {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    padding: 6px;
+    width: 180px;
+    border: 2px solid #222;
+    border-radius: 6px;
+    background: #c6e3f3;
+    color: black;
+  }
+
+  button {
+    margin-top: 10px;
+    padding: 8px 16px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: none;
+    background: #1f5eff;
+    color: white;
+    cursor: pointer;
+  }
+
+  .text {
+    font-size: 16px;
+    margin-top: 10px;
+    color: black;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- 1. 標題 -->
+  <div class="title">
+    <img src="https://cdn-icons-png.flaticon.com/512/194/194279.png">
+    妙麗歲數計算機
+  </div>
+
+  <div class="lcd-box">
+
+    <!-- 2. 出生日期 -->
+    <div class="label">狗狗的出生日期：</div>
+    <input type="date" id="birthInput">
+
+    <!-- 3. 開始計算按鈕 -->
+    <button onclick="calc()">開始計算</button>
+
+    <!-- 4. y 結果 -->
+    <div class="text" id="dogAge">妙麗現在大約 0 歲狗年齡，</div>
+
+    <!-- 5. z 結果 -->
+    <div class="text" id="humanAge">換算成人類年齡大約是 0 歲。</div>
+
+  </div>
+</div>
+
+
+<script>
+  const input = document.getElementById("birthInput");
+  const dogAge = document.getElementById("dogAge");
+  const humanAge = document.getElementById("humanAge");
+
+  // 取得今天日期 (YYYY-MM-DD)
+  function today() {
+    const d = new Date();
+    let m = (d.getMonth() + 1).toString().padStart(2, "0");
+    let day = d.getDate().toString().padStart(2, "0");
+    return `${d.getFullYear()}-${m}-${day}`;
+  }
+
+  // 讀取 localStorage
+  window.onload = () => {
+    const saved = localStorage.getItem("dogBirth");
+    input.value = saved ? saved : today();
+  };
+
+  function calc() {
+    const x = input.value;
+    localStorage.setItem("dogBirth", x);
+
+    const t = new Date();
+    const b = new Date(x);
+
+    // x > t 直接顯示 0
+    if (b > t) {
+      dogAge.innerText = `妙麗現在大約 0 歲狗年齡，`;
+      humanAge.innerText = `換算成人類年齡大約是 0 歲。`;
+      return;
+    }
+
+    // y = 年數（含小數）
+    let y = (t - b) / (365.25 * 24 * 60 * 60 * 1000);
+    if (y < 0) y = 0;
+    y = parseFloat(y.toFixed(1));
+
+    // z = 16*ln(y)+31
+    let z = y > 0 ? (16 * Math.log(y) + 31) : 0;
+    if (z < 0) z = 0;
+    z = Math.round(z);
+
+    dogAge.innerText = `妙麗現在大約 ${y} 歲狗年齡，`;
+    humanAge.innerText = `換算成人類年齡大約是 ${z} 歲。`;
+  }
+</script>
+
+</body>
+</html>
